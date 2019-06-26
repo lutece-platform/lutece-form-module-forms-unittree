@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
+
+	<bean id="forms-unittree.formPanelInitializer.panelResponseForms.queryPart.factory" class="fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.querypart.factory.impl.UnittreeFormPanelFormResponseInitializerQueryPartFactory"/>
+	<bean id="forms-unittree.formPanelInitializer.panelResponseForms.display.factory" class="fr.paris.lutece.plugins.forms.modules.unittree.web.form.panel.display.initializer.factory.impl.UnittreeFormPanelFormsDisplayInitializerFactory"/>
+
+	<!-- Panels Configurations -->
+	<bean id="forms-unittree.formsUnittreePanel.panelConfiguration" class="fr.paris.lutece.plugins.forms.business.form.panel.configuration.FormPanelConfiguration">
+		<constructor-arg name="strTechnicalCode" type="java.lang.String" value="forms-unittree"/>
+		<constructor-arg name="nPosition" type="int" value="2"/>
+		<constructor-arg name="strTitle" type="java.lang.String" value="module.forms.unittree.formsUnittreePanel.panelConfiguration.title"/>
+		<constructor-arg name="listFormPanelInitializerName">
+			<list>
+				<value type="java.lang.String">fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.impl.UnittreeFormPanelInitializer</value>
+			</list>
+		</constructor-arg>
+	</bean>
+</beans>
