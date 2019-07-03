@@ -30,6 +30,7 @@ public class UnittreeFormPanelDisplayInitialiser extends FormPanelFormResponseId
 				formReponseIdList.addAll(
 						assignmentList.stream( )
 						.filter( assignement -> FormResponse.RESOURCE_TYPE.equals( assignement.getResourceType( ) ) )
+						.filter( UnitAssignment::isActive )
 						.map( UnitAssignment::getIdResource )
 						.distinct( )
 						.collect( Collectors.toList( ) ) );
