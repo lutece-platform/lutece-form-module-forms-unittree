@@ -6,6 +6,8 @@
 
 	<bean id="forms-unittree.formPanelInitializer.panelResponseForms.queryPart.factory" class="fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.querypart.factory.impl.UnittreeFormPanelFormResponseInitializerQueryPartFactory"/>
 	<bean id="forms-unittree.formPanelInitializer.panelResponseForms.display.factory" class="fr.paris.lutece.plugins.forms.modules.unittree.web.form.panel.display.initializer.factory.impl.UnittreeFormPanelFormsDisplayInitializerFactory"/>
+	<bean id="forms-unittree.formPanelInitializer.panelResponseForms.subunit.queryPart.factory" class="fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.querypart.factory.impl.SubunitFormPanelFormResponseInitializerQueryPartFactory"/>
+	<bean id="forms-unittree.formPanelInitializer.panelResponseForms.subunit.display.factory" class="fr.paris.lutece.plugins.forms.modules.unittree.web.form.panel.display.initializer.factory.impl.SubunitFormPanelFormsDisplayInitializerFactory"/>
 
 	<!-- Panels Configurations -->
 	<bean id="forms-unittree.formsUnittreePanel.panelConfiguration" class="fr.paris.lutece.plugins.forms.business.form.panel.configuration.FormPanelConfiguration">
@@ -15,6 +17,16 @@
 		<constructor-arg name="listFormPanelInitializerName">
 			<list>
 				<value type="java.lang.String">fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.impl.UnittreeFormPanelInitializer</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	<bean id="forms-unittree.formsUnittreePanel.subunit.panelConfiguration" class="fr.paris.lutece.plugins.forms.business.form.panel.configuration.FormPanelConfiguration">
+		<constructor-arg name="strTechnicalCode" type="java.lang.String" value="forms-unittree-subunit"/>
+		<constructor-arg name="nPosition" type="int" value="3"/>
+		<constructor-arg name="strTitle" type="java.lang.String" value="module.forms.unittree.formsUnittreePanel.subunit.panelConfiguration.title"/>
+		<constructor-arg name="listFormPanelInitializerName">
+			<list>
+				<value type="java.lang.String">fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.impl.SubunitFormPanelInitializer</value>
 			</list>
 		</constructor-arg>
 	</bean>
