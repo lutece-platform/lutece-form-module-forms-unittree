@@ -15,27 +15,25 @@ import fr.paris.lutece.plugins.unittree.business.unit.UnitHome;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
 
-public class UnittreeFormPanelDisplayInitialiser extends FormPanelFormResponseIdFilterDisplayInitialiser {
+public class UnittreeFormPanelDisplayInitialiser extends FormPanelFormResponseIdFilterDisplayInitialiser
+{
 
-	@Override
-	protected List<Integer> getIdList(HttpServletRequest request) {
-		List<Integer> formReponseIdList = new ArrayList<>( );
-		AdminUser currentUser = AdminUserService.getAdminUser( request );
-		if ( currentUser != null ) {
-			List<Unit> unitList = UnitHome.findByIdUser( currentUser.getUserId( ) );
-			
-			for ( Unit unit : unitList )
-			{
-				List<UnitAssignment> assignmentList = UnitAssignmentHome.findByUnit( unit.getIdUnit( ) );
-				formReponseIdList.addAll(
-						assignmentList.stream( )
-						.filter( assignement -> FormResponse.RESOURCE_TYPE.equals( assignement.getResourceType( ) ) )
-						.filter( UnitAssignment::isActive )
-						.map( UnitAssignment::getIdResource )
-						.distinct( )
-						.collect( Collectors.toList( ) ) );
-			}
-		}
-		return formReponseIdList;
-	}
+    @Override
+    protected List<Integer> getIdList( HttpServletRequest request )
+    {
+        List<Integer> formReponseIdList = new ArrayList<>( );
+        AdminUser currentUser = AdminUserService.getAdminUser( request );
+        if ( currentUser != null )
+        {
+            List<Unit> unitList = UnitHome.findByIdUser( currentUser.getUserId( ) );
+
+            for ( Unit unit : unitList )
+            {
+                List<UnitAssignment> assignmentList = UnitAssignmentHome.findByUnit( unit.getIdUnit( ) );
+                formReponseIdList.addAll( assignmentList.stream( ).filter( assignement -> FormResponse.RESOURCE_TYPE.equals( assignement.getResourceType( ) ) )
+                        .filter( UnitAssignment::isActive ).map( UnitAssignment::getIdResource ).distinct( ).collect( Collectors.toList( ) ) );
+            }
+        }
+        return formReponseIdList;
+    }
 }
