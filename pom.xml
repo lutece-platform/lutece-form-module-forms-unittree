@@ -26,19 +26,19 @@
         <dependency>
             <groupId>fr.paris.lutece</groupId>
             <artifactId>lutece-core</artifactId>
-            <version>[6.0.1,)</version>
+            <version>[6.2.0,)</version>
             <type>lutece-core</type>
         </dependency>
         <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>plugin-unittree</artifactId>
-            <version>[2.1.5-SNAPSHOT,)</version>
+            <version>[2.1.5,)</version>
             <type>lutece-plugin</type>
         </dependency>
         <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>plugin-forms</artifactId>
-            <version>[1.0.3-SNAPSHOT,)</version>
+            <version>[1.0.3,)</version>
             <type>lutece-plugin</type>
         </dependency>
     </dependencies>
@@ -47,5 +47,10 @@
         <componentName>forms-unittree</componentName>
         <jiraProjectName>FORMSUT</jiraProjectName>
         <jiraComponentId>15361</jiraComponentId>
-    </properties>
+</properties>
+	<scm>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-form-module-forms-unittree.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-form-module-forms-unittree.git</developerConnection>
+        <url>https://github.com/lutece-platform/lutece-form-module-forms-unittree.git</url>
+  </scm>
 </project>
