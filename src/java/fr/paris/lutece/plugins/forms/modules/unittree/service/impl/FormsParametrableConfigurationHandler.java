@@ -236,7 +236,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         String action = request.getParameter( PARAMETER_ACTION );
         if ( action != null )
         {
-            doProcessAction( action, request, task );
+            doProcessAction( action, request );
         }
 
         if ( create )
@@ -250,7 +250,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         return null;
     }
 
-    private void doProcessAction( String action, HttpServletRequest request, ITask task )
+    private void doProcessAction( String action, HttpServletRequest request )
     {
         switch( action )
         {
