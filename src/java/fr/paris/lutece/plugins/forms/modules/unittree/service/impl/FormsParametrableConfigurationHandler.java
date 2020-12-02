@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2020, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.forms.modules.unittree.service.impl;
 
 import java.util.HashMap;
@@ -49,7 +82,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String MARK_RESPONSE_LIST = "response_list";
     private static final String MARK_RESPONSE_VALUE = "response_value";
     private static final String MARK_UNIT_LIST = "unit_list";
-    
+
     private static final String MARK_MAPPING_LIST = "mapping_list";
     private static final String MARK_ORDER_LIST = "order_list";
 
@@ -90,10 +123,10 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         {
             _config = new UnitSelectionConfig( );
         }
-        
+
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
-        if ( _config.getIdForm( )  != -1 )
+        if ( _config.getIdForm( ) != -1 )
         {
             model.put( MARK_ID_FORM, _config.getIdForm( ) );
             model.put( MARK_STEP_LIST, StepHome.getStepReferenceListByForm( _config.getIdForm( ) ) );
@@ -106,7 +139,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         if ( _unitSelectionConfigValue.getQuestion( ) != null )
         {
             model.put( MARK_ID_QUESTION, _unitSelectionConfigValue.getQuestion( ).getId( ) );
-            model.put( MARK_RESPONSE_LIST, getResponseReferenceList(  _unitSelectionConfigValue.getQuestion( ).getId( ) ) );
+            model.put( MARK_RESPONSE_LIST, getResponseReferenceList( _unitSelectionConfigValue.getQuestion( ).getId( ) ) );
         }
         if ( StringUtils.isNotEmpty( _unitSelectionConfigValue.getValue( ) ) )
         {
@@ -115,7 +148,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         model.put( MARK_UNIT_LIST, getUnitReferenceList( ) );
         model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
         model.put( MARK_ORDER_LIST, getOrderReferenceList( ) );
-        
+
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CONFIGURATION, locale, model );
         return template.getHtml( );
     }
@@ -247,7 +280,8 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
                 break;
             case ACTION_REMOVE_MAPPING:
                 int idToRemove = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
-                List<UnitSelectionConfigValue> newList = _config.getListConfigValues( ).stream( ).filter( configValue -> configValue.getIdConfigValue( ) != idToRemove ).collect( Collectors.toList( ) );
+                List<UnitSelectionConfigValue> newList = _config.getListConfigValues( ).stream( )
+                        .filter( configValue -> configValue.getIdConfigValue( ) != idToRemove ).collect( Collectors.toList( ) );
                 _config.setListConfigValues( newList );
                 break;
             case ACTION_CHANGE_ORDER:
@@ -259,7 +293,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
                 break;
         }
     }
-    
+
     private void doChangeOrder( int idToMove, int newOrder )
     {
         List<UnitSelectionConfigValue> newList = _config.getListConfigValues( );
@@ -270,7 +304,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         }
         int oldOrder = configToChangeOrder.getOrder( );
         boolean changeOrderDown = newOrder < configToChangeOrder.getOrder( );
-        
+
         for ( UnitSelectionConfigValue configValue : newList )
         {
             if ( configValue.getIdConfigValue( ) == idToMove )
