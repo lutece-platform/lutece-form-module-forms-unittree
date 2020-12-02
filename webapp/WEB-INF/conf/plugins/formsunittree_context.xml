@@ -30,4 +30,14 @@
 			</list>
 		</constructor-arg>
 	</bean>
+    
+    <!-- Service -->
+    <bean id="forms-unittree.unitSelectionConfigService" class="fr.paris.lutece.plugins.forms.modules.unittree.service.impl.UnitSelectionConfigService" />
+    
+    <!-- Dao -->
+    <bean id="forms-unittree.unitSelectionConfigValueDao" class="fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValueDao" />
+    <bean id="forms-unittree.unitSelectionConfigDao" class="fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigDao" />
+    
+    <bean id="forms-unittree.formsParametrableUnitSelection" class="fr.paris.lutece.plugins.forms.modules.unittree.service.FormsParametrableUnitSelection" />
+    <bean id="forms-unittree.formsParametrableConfigurationHandler" class="fr.paris.lutece.plugins.forms.modules.unittree.service.impl.FormsParametrableConfigurationHandler" />
 </beans>
