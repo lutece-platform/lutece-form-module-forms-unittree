@@ -1,35 +1,56 @@
-<@row>
-	<@formGroup labelFor="form_select" labelKey="#i18n{module.forms.unittree.selection.parametrable.config.label}" formStyle='horizontal'>
-		<@select name="form_select" items=form_list default_value='${id_form!}' />
-		<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
-		<#if id_form??>
-			<@select name="step_select" items=step_list default_value='${id_step!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
-		</#if>
-		<#if id_step??>
-			<@select name="question_select" items=question_list default_value='${id_question!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
-		</#if>
-		<#if id_question??>
-			<@select name="response_select" items=response_list default_value='${response_value!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_response_config' />
-		</#if>
-		<#if response_value??>
-			<@select name="unit_select" items=unit_list default_value='' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_unit_config' />
-		</#if>
+<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.label}'>
+	<@inputGroup>
+		<@select name='form_select' items=form_list default_value='${id_form!}' />
+		<@inputGroupItem>
+			<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+		</@inputGroupItem>
+	</@inputGroup>
+	<#if id_form??>
+		<@inputGroup params='style="margin-top:1rem;"'>
+			<@select name='step_select' items=step_list default_value='${id_step!}' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+			</@inputGroupItem>
+		</@inputGroup>
+	</#if>
+	<#if id_step??>
+		<@inputGroup params='style="margin-top:1rem;"'>
+			<@select name='question_select' items=question_list default_value='${id_question!}' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
+			</@inputGroupItem>
+		</@inputGroup>
+	</#if>
+	<#if id_question??>
+		<@inputGroup params='style="margin-top:1rem;"'>
+			<@select name='response_select' items=response_list default_value='${response_value!}' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_response_config' />
+			</@inputGroupItem>
+		</@inputGroup>
+	</#if>
+	<#if response_value??>
+		<@inputGroup params='style="margin-top:1rem;"'>
+			<@select name='unit_select' items=unit_list default_value='' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_unit_config' />
+			</@inputGroupItem>
+		</@inputGroup>
+	</#if>
+</@formGroup>
+
+<@input type='hidden' id='mapping_id' name='mapping_id' />
+<#list mapping_list as mapping>
+	<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.existing}'>
+		<@staticText>
+			${mapping.step.title}/${mapping.question.title}/${mapping.value} => ${mapping.unit.label}
+		</@staticText>
+		<@inputGroup>
+			<@select name='mapping_order_${mapping.idConfigValue}' items=order_list default_value='${mapping.order!}' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='change_order' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+				<@button type='submit' color='danger' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+			</@inputGroupItem>
+		</@inputGroup>
 	</@formGroup>
-</@row>
-<@row>
-	<@input id='mapping_id' type='hidden' name='mapping_id' />
-	<#list mapping_list as mapping>
-		<@formGroup labelFor="form_select" labelKey="#i18n{module.forms.unittree.selection.parametrable.config.existing}" formStyle='horizontal'>
-			<@staticText>
-				${mapping.step.title}/${mapping.question.title}/${mapping.value} => ${mapping.unit.label}
-			</@staticText>
-			<@select name="mapping_order_${mapping.idConfigValue}" items=order_list default_value='${mapping.order!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='change_order' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
-			<@button type='submit' style='danger' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
-		</@formGroup>
-	</#list>
-</@row>
+</#list>
