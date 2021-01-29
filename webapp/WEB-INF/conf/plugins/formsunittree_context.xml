@@ -30,8 +30,7 @@
         <constructor-arg
             name="listFormPanelInitializerName">
             <list>
-                <value type="java.lang.String">fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.impl.UnittreeFormPanelInitializer
-                </value>
+                <value type="java.lang.String">fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.impl.UnittreeFormPanelInitializer</value>
             </list>
         </constructor-arg>
     </bean>
@@ -48,8 +47,7 @@
         <constructor-arg
             name="listFormPanelInitializerName">
             <list>
-                <value type="java.lang.String">fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.impl.SubunitFormPanelInitializer
-                </value>
+                <value type="java.lang.String">fr.paris.lutece.plugins.forms.modules.unittree.business.form.panel.initializer.impl.SubunitFormPanelInitializer</value>
             </list>
         </constructor-arg>
     </bean>
