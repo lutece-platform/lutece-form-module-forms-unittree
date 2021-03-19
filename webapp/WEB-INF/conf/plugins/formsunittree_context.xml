@@ -4,13 +4,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean
-        id="forms-unittree.formPanelInitializer.panelResponseForms.display.factory"
-        class="fr.paris.lutece.plugins.forms.modules.unittree.web.form.panel.display.initializer.factory.impl.UnittreeFormPanelFormsDisplayInitializerFactory" />
-    <bean
-        id="forms-unittree.formPanelInitializer.panelResponseForms.subunit.display.factory"
-        class="fr.paris.lutece.plugins.forms.modules.unittree.web.form.panel.display.initializer.factory.impl.SubunitFormPanelFormsDisplayInitializerFactory" />
-
     <!-- Panels Configurations -->
     <bean id="forms-unittree.formsUnittreePanel.panelConfiguration"
         class="fr.paris.lutece.plugins.forms.business.form.panel.configuration.FormPanelConfiguration">
