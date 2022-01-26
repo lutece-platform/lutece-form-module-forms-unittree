@@ -41,6 +41,7 @@ public class UnitSelectionConfig
     private int _nIdConfig = -1;
     private int _nIdForm = -1;
     private int _nIdTask = -1;
+    private boolean _bMultiform;
     private List<UnitSelectionConfigValue> _listConfigValues = new ArrayList<>( );
 
     /**
@@ -109,6 +110,22 @@ public class UnitSelectionConfig
     public void setListConfigValues( List<UnitSelectionConfigValue> listConfigValues )
     {
         this._listConfigValues = new ArrayList<>( listConfigValues );
+    }
+
+    /**
+     * @return the bMultiform
+     */
+    public boolean isMultiform( )
+    {
+        return _bMultiform;
+    }
+
+    /**
+     * @param bMultiform the bMultiform to set
+     */
+    public void setMultiform( boolean bMultiform )
+    {
+        _bMultiform = bMultiform;
     }
 
     public void addConfigValue( UnitSelectionConfigValue configValue )

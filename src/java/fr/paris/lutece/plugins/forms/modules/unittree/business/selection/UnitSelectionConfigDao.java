@@ -42,12 +42,12 @@ public class UnitSelectionConfigDao implements IUnitSelectionConfigDao
 {
     public static final String BEAN_NAME = "forms-unittree.unitSelectionConfigDao";
 
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config,id_form,id_task FROM forms_unittree_unit_selection_config ";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config,id_form,id_task,is_multiform FROM forms_unittree_unit_selection_config ";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_config = ?";
     private static final String SQL_QUERY_SELECT_BY_TASK = SQL_QUERY_SELECT_ALL + " WHERE id_task = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO forms_unittree_unit_selection_config ( id_form,id_task ) VALUES ( ? , ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO forms_unittree_unit_selection_config ( id_form,id_task,is_multiform ) VALUES ( ? , ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM forms_unittree_unit_selection_config WHERE id_config = ?";
-    private static final String SQL_QUERY_UPDATE = "UPDATE forms_unittree_unit_selection_config SET id_config = ? , id_form = ? , id_task = ? WHERE id_config = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE forms_unittree_unit_selection_config SET id_config = ? , id_form = ? , id_task = ?, is_multiform = ? WHERE id_config = ?";
 
     @Override
     public void insert( UnitSelectionConfig configValue, Plugin plugin )
@@ -57,6 +57,7 @@ public class UnitSelectionConfigDao implements IUnitSelectionConfigDao
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, configValue.getIdForm( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdTask( ) );
+            daoUtil.setBoolean( ++nIndex, configValue.isMultiform( ) );
             daoUtil.executeUpdate( );
 
             if ( daoUtil.nextGeneratedKey( ) )
@@ -111,6 +112,8 @@ public class UnitSelectionConfigDao implements IUnitSelectionConfigDao
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdForm( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdTask( ) );
+            daoUtil.setBoolean( ++nIndex, configValue.isMultiform( ) );
+            
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
             daoUtil.executeUpdate( );
         }
@@ -136,6 +139,7 @@ public class UnitSelectionConfigDao implements IUnitSelectionConfigDao
         config.setIdConfig( daoUtil.getInt( ++nIndex ) );
         config.setIdForm( daoUtil.getInt( ++nIndex ) );
         config.setIdTask( daoUtil.getInt( ++nIndex ) );
+        config.setMultiform( daoUtil.getBoolean( ++nIndex ) );
         return config;
     }
 }

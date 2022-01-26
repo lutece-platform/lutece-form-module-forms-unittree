@@ -50,13 +50,13 @@ public class UnitSelectionConfigValueDao implements IUnitSelectionConfigValueDao
 {
     public static final String BEAN_NAME = "forms-unittree.unitSelectionConfigValueDao";
 
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config_value,id_config,id_step,id_question,response_value,id_unit,id_order FROM forms_unittree_unit_selection_config_value ";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config_value,id_config,id_step,id_question,response_value,id_unit,id_order,code FROM forms_unittree_unit_selection_config_value ";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_config_value = ?";
     private static final String SQL_QUERY_SELECT_BY_CONFIG = SQL_QUERY_SELECT_ALL + " WHERE id_config = ? order by id_order asc";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO forms_unittree_unit_selection_config_value ( id_config,id_step,id_question,response_value,id_unit,id_order ) VALUES ( ?, ?, ?, ?, ?, ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO forms_unittree_unit_selection_config_value ( id_config,id_step,id_question,response_value,id_unit,id_order,code ) VALUES ( ?, ?, ?, ?, ?, ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM forms_unittree_unit_selection_config_value WHERE id_config_value = ?";
     private static final String SQL_QUERY_DELETE_BY_CONFIG = "DELETE FROM forms_unittree_unit_selection_config_value WHERE id_config = ?";
-    private static final String SQL_QUERY_UPDATE = "UPDATE forms_unittree_unit_selection_config_value SET id_config_value=? ,id_config=? ,id_step=? ,id_question=? ,response_value=? ,id_unit=?,id_order=? WHERE id_config_value = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE forms_unittree_unit_selection_config_value SET id_config_value=? ,id_config=? ,id_step=? ,id_question=? ,response_value=? ,id_unit=?,id_order=?,code=? WHERE id_config_value = ?";
 
     @Override
     public void insert( UnitSelectionConfigValue configValue, Plugin plugin )
@@ -65,11 +65,26 @@ public class UnitSelectionConfigValueDao implements IUnitSelectionConfigValueDao
         {
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
-            daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
-            daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            if ( configValue.getStep( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setInt( ++nIndex, -1 );
+            }
+            if ( configValue.getQuestion( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setInt( ++nIndex, -1 );
+            }
             daoUtil.setString( ++nIndex, configValue.getValue( ) );
             daoUtil.setInt( ++nIndex, configValue.getUnit( ).getIdUnit( ) );
             daoUtil.setInt( ++nIndex, configValue.getOrder( ) );
+            daoUtil.setString( ++nIndex, configValue.getCode( ) );
             daoUtil.executeUpdate( );
 
             if ( daoUtil.nextGeneratedKey( ) )
@@ -88,11 +103,27 @@ public class UnitSelectionConfigValueDao implements IUnitSelectionConfigValueDao
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, configValue.getIdConfigValue( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
-            daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
-            daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            if ( configValue.getStep( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setInt( ++nIndex, -1 );
+            }
+            if ( configValue.getQuestion( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setInt( ++nIndex, -1 );
+            }
             daoUtil.setString( ++nIndex, configValue.getValue( ) );
             daoUtil.setInt( ++nIndex, configValue.getUnit( ).getIdUnit( ) );
             daoUtil.setInt( ++nIndex, configValue.getOrder( ) );
+            daoUtil.setString( ++nIndex, configValue.getCode( ) );
+            
             daoUtil.setInt( ++nIndex, configValue.getIdConfigValue( ) );
             daoUtil.executeUpdate( );
         }
@@ -169,7 +200,7 @@ public class UnitSelectionConfigValueDao implements IUnitSelectionConfigValueDao
         config.setValue( daoUtil.getString( ++nIndex ) );
         config.setUnit( UnitHome.findByPrimaryKey( daoUtil.getInt( ++nIndex ) ) );
         config.setOrder( daoUtil.getInt( ++nIndex ) );
-
+        config.setCode( daoUtil.getString( ++nIndex ) );
         return config;
     }
 }

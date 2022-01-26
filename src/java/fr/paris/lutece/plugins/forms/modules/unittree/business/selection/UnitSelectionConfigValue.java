@@ -43,6 +43,7 @@ public class UnitSelectionConfigValue
     private int _nIdConfig;
     private Step _step;
     private Question _question;
+    private String _strCode;
     private String _strValue;
     private Unit _unit;
     private int _nOrder;
@@ -164,5 +165,21 @@ public class UnitSelectionConfigValue
     public void setUnit( Unit unit )
     {
         _unit = unit;
+    }
+
+    /**
+     * @return the strCode
+     */
+    public String getCode( )
+    {
+        return _strCode;
+    }
+
+    /**
+     * @param strCode the strCode to set
+     */
+    public void setCode( String strCode )
+    {
+        _strCode = strCode;
     }
 }
