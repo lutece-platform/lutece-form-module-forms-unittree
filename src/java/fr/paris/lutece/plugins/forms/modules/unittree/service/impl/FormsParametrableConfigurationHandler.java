@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.forms.modules.unittree.service.impl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -82,9 +84,12 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String MARK_RESPONSE_LIST = "response_list";
     private static final String MARK_RESPONSE_VALUE = "response_value";
     private static final String MARK_UNIT_LIST = "unit_list";
+    private static final String MARK_CODE = "code";
 
     private static final String MARK_MAPPING_LIST = "mapping_list";
     private static final String MARK_ORDER_LIST = "order_list";
+    private static final String MARK_MULTIFORM = "multiform";
+    private static final String MARK_CODE_LIST = "code_list";
 
     private static final String PARAMETER_ACTION = "apply";
     private static final String PARAMETER_FORM = "form_select";
@@ -94,7 +99,9 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String PARAMETER_UNIT = "unit_select";
     private static final String PARAMETER_MAPPING_ID = "mapping_id";
     private static final String PARAMETER_MAPPING_ORDER = "mapping_order_";
-
+    private static final String PARAMETER_MULTIFORM = "multiform";
+    private static final String PARAMETER_CODE = "code_select";
+    
     private static final String ACTION_SELECT_FORM = "select_form_config";
     private static final String ACTION_SELECT_STEP = "select_step_config";
     private static final String ACTION_SELECT_QUESTION = "select_question_config";
@@ -102,6 +109,8 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String ACTION_SELECT_UNIT = "select_unit_config";
     private static final String ACTION_REMOVE_MAPPING = "delete_mapping";
     private static final String ACTION_CHANGE_ORDER = "change_order";
+    private static final String ACTION_SELECT_MULTIFORM = "select_multiform";
+    private static final String ACTION_SELECT_CODE = "select_code";
 
     private static final String TEMPLATE_CONFIGURATION = "admin/plugins/forms/modules/unittree/unitselection/config/forms_unit_selection_parametrable_configuration.html";
 
@@ -125,6 +134,12 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         }
 
         Map<String, Object> model = new HashMap<>( );
+        model.put( MARK_MULTIFORM, _config.isMultiform( ) ); 
+        if ( _config.isMultiform( ) )
+        {
+            model.put( MARK_CODE_LIST, getCodeList( ) );
+        }
+
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
         if ( _config.getIdForm( ) != -1 )
         {
@@ -145,6 +160,10 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         {
             model.put( MARK_RESPONSE_VALUE, _unitSelectionConfigValue.getValue( ) );
         }
+        if ( StringUtils.isNotEmpty( _unitSelectionConfigValue.getCode( ) ) )
+        {
+            model.put( MARK_CODE, _unitSelectionConfigValue.getCode( ) );
+        }
         model.put( MARK_UNIT_LIST, getUnitReferenceList( ) );
         model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
         model.put( MARK_ORDER_LIST, getOrderReferenceList( ) );
@@ -152,7 +171,20 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CONFIGURATION, locale, model );
         return template.getHtml( );
     }
-
+    
+    private ReferenceList getCodeList( )
+    {
+        ReferenceList refList = new ReferenceList( );
+        List<Question> questionList = QuestionHome.getQuestionsList( ).stream( ).filter( this::canQuestionBeCondition ).collect( Collectors.toList( ) );
+        List<String> codeList = questionList.stream( ).map( Question::getCode ).distinct( ).collect( Collectors.toList( ) );
+        codeList.sort( Comparator.naturalOrder( ) );
+        for ( String code : codeList )
+        {
+            refList.addItem( code, code );
+        }
+        return refList;
+    }
+    
     private ReferenceList getOrderReferenceList( )
     {
         ReferenceList refList = new ReferenceList( );
@@ -254,9 +286,21 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     {
         switch( action )
         {
+            case ACTION_SELECT_MULTIFORM:
+                _config.setMultiform( request.getParameter( PARAMETER_MULTIFORM ) != null );
+                _config.setIdForm( 0 );
+                _unitSelectionConfigValue.setCode( null );
+                _unitSelectionConfigValue.setQuestion( null );
+                _unitSelectionConfigValue.setValue( null );
+                _unitSelectionConfigValue.setUnit( null );
+                _unitSelectionConfigValue = new UnitSelectionConfigValue( );
+                _config.setListConfigValues( new ArrayList<>( ) );
+                break;
+            case ACTION_SELECT_CODE:
+                _unitSelectionConfigValue.setCode( request.getParameter( PARAMETER_CODE ) );
+                break;
             case ACTION_SELECT_FORM:
                 _config.setIdForm( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) );
-                _unitSelectionConfigValue = new UnitSelectionConfigValue( );
                 break;
             case ACTION_SELECT_STEP:
                 _unitSelectionConfigValue.setStep( StepHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_STEP ) ) ) );
@@ -274,6 +318,10 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
                 _unitSelectionConfigValue.setUnit( null );
                 break;
             case ACTION_SELECT_UNIT:
+                if ( _config.isMultiform( ) )
+                {
+                    _unitSelectionConfigValue.setValue( request.getParameter( PARAMETER_RESPONSE ) );
+                }
                 _unitSelectionConfigValue.setUnit( UnitHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_UNIT ) ) ) );
                 _config.addConfigValue( _unitSelectionConfigValue );
                 _unitSelectionConfigValue = new UnitSelectionConfigValue( );

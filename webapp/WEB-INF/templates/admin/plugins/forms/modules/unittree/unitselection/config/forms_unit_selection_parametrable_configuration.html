@@ -1,56 +1,107 @@
-<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.label}'>
-	<@inputGroup>
-		<@select name='form_select' items=form_list default_value='${id_form!}' />
+<@formGroup>
+	<@inputGroup size='sm'>
+		<@checkBox labelFor='multiform' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
 		<@inputGroupItem>
-			<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+			<@button type='submit' buttonIcon='check' name='apply' value='select_multiform' size='sm'/>
 		</@inputGroupItem>
 	</@inputGroup>
-	<#if id_form??>
-		<@inputGroup params='style="margin-top:1rem;"'>
-			<@select name='step_select' items=step_list default_value='${id_step!}' />
-			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
-			</@inputGroupItem>
-		</@inputGroup>
-	</#if>
-	<#if id_step??>
-		<@inputGroup params='style="margin-top:1rem;"'>
-			<@select name='question_select' items=question_list default_value='${id_question!}' />
-			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
-			</@inputGroupItem>
-		</@inputGroup>
-	</#if>
-	<#if id_question??>
-		<@inputGroup params='style="margin-top:1rem;"'>
-			<@select name='response_select' items=response_list default_value='${response_value!}' />
-			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='select_response_config' />
-			</@inputGroupItem>
-		</@inputGroup>
-	</#if>
-	<#if response_value??>
-		<@inputGroup params='style="margin-top:1rem;"'>
-			<@select name='unit_select' items=unit_list default_value='' />
-			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='select_unit_config' />
-			</@inputGroupItem>
-		</@inputGroup>
-	</#if>
 </@formGroup>
-
 <@input type='hidden' id='mapping_id' name='mapping_id' />
-<#list mapping_list as mapping>
-	<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.existing}'>
-		<@staticText>
-			${mapping.step.title}/${mapping.question.title}/${mapping.value} => ${mapping.unit.label}
-		</@staticText>
+
+<#if multiform>
+	<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
 		<@inputGroup>
-			<@select name='mapping_order_${mapping.idConfigValue}' items=order_list default_value='${mapping.order!}' />
+			<@select name='code_select' items=code_list />
 			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='change_order' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
-				<@button type='submit' color='danger' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+				<@button type='submit' buttonIcon='check' name='apply' value='select_code' />
 			</@inputGroupItem>
 		</@inputGroup>
 	</@formGroup>
-</#list>
+	<#if code??>
+		<@formGroup labelFor='response_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelResponse}'>
+			<@input type='text' name='response_select' />
+		</@formGroup>
+		<@formGroup labelFor='unit_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelUnit}'>
+			<@inputGroup params='style="margin-top:1rem;"'>
+				<@select name='unit_select' items=unit_list default_value='' />
+				<@inputGroupItem>
+					<@button type='submit' buttonIcon='check' name='apply' value='select_unit_config' />
+				</@inputGroupItem>
+			</@inputGroup>
+		</@formGroup>
+	</#if>
+	
+	<#list mapping_list as mapping>
+		<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
+			<@staticText>
+				${mapping.code}/${mapping.value} => ${mapping.unit.label}
+				<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' />
+			</@staticText>
+		</@formGroup>
+	</#list>
+<#else>	
+	<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelForm}'>
+		<@inputGroup>
+			<@select name='form_select' items=form_list default_value='${id_form!}' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+			</@inputGroupItem>
+		</@inputGroup>
+	</@formGroup>
+		<#if id_form??>
+			<@formGroup labelFor='step_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelStep}'>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<@select name='step_select' items=step_list default_value='${id_step!}' />
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</@formGroup>
+		</#if>
+		<#if id_step??>
+			<@formGroup labelFor='question_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelQuestion}'>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<@select name='question_select' items=question_list default_value='${id_question!}' />
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</@formGroup>
+		</#if>
+		<#if id_question??>
+			<@formGroup labelFor='response_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelResponse}'>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<@select name='response_select' items=response_list default_value='${response_value!}' />
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_response_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</@formGroup>
+		</#if>
+		<#if response_value??>
+			<@formGroup labelFor='unit_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelUnit}'>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<@select name='unit_select' items=unit_list default_value='' />
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_unit_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</@formGroup>
+		</#if>
+	
+	
+	<#list mapping_list as mapping>
+		<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.existing}'>
+			<@staticText>
+				${mapping.step.title}/${mapping.question.title}/${mapping.value} => ${mapping.unit.label}
+			</@staticText>
+			<@inputGroup>
+				<@select name='mapping_order_${mapping.idConfigValue}' items=order_list default_value='${mapping.order!}' />
+				<@inputGroupItem>
+					<@button type='submit' buttonIcon='check' name='apply' value='change_order' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+					<@button type='submit' color='danger' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+				</@inputGroupItem>
+			</@inputGroup>
+		</@formGroup>
+	</#list>
+</#if>
