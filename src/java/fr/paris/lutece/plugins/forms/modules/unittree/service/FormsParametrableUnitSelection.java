@@ -41,6 +41,9 @@ import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.QuestionHome;
+import fr.paris.lutece.plugins.forms.business.Step;
+import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfig;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValue;
 import fr.paris.lutece.plugins.unittree.exception.AssignmentNotPossibleException;
@@ -66,7 +69,7 @@ public class FormsParametrableUnitSelection implements IParametrableUnitSelectio
 
         for ( UnitSelectionConfigValue configValue : config.getListConfigValues( ) )
         {
-            if ( configValue.getValue( ).equals( findResponseValue( formResponse, configValue.getQuestion( ) ) ) )
+            if ( configValue.getValue( ).equals( findResponseValue( formResponse, config.isMultiform( ), configValue ) ) )
             {
                 return configValue.getUnit( ).getIdUnit( );
             }
@@ -74,20 +77,37 @@ public class FormsParametrableUnitSelection implements IParametrableUnitSelectio
         return -1;
     }
 
-    private String findResponseValue( FormResponse formResponse, Question question )
+    private String findResponseValue( FormResponse formResponse, boolean isMultiform, UnitSelectionConfigValue configValue )
     {
         String response = null;
-
+        Question question = null;
+        
+        if ( isMultiform )
+        {
+            for ( Question q : QuestionHome.findByCode( configValue.getCode( ) ) )
+            {
+                Step step = StepHome.findByPrimaryKey( q.getIdStep( ) );
+                if ( step.getIdForm( ) == formResponse.getFormId( ) )
+                {
+                    question = q;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            question = configValue.getQuestion( );
+        }
+        int questionId = question != null ? question.getId( ) : -1;
         for ( FormResponseStep step : formResponse.getSteps( ) )
         {
-            FormQuestionResponse formQuestionResponse = step.getQuestions( ).stream( ).filter( fqr -> fqr.getQuestion( ).getId( ) == question.getId( ) )
+            FormQuestionResponse formQuestionResponse = step.getQuestions( ).stream( ).filter( fqr -> fqr.getQuestion( ).getId( ) == questionId )
                     .findFirst( ).orElse( null );
             if ( formQuestionResponse != null )
             {
                 return formQuestionResponse.getEntryResponse( ).get( 0 ).getResponseValue( );
             }
         }
-
         return response;
     }
 }
