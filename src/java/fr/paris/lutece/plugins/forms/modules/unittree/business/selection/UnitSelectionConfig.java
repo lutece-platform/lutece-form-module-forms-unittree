@@ -133,4 +133,21 @@ public class UnitSelectionConfig
         configValue.setOrder( this._listConfigValues.size( ) + 1 );
         this._listConfigValues.add( configValue );
     }
+    
+    /**
+     * update the config value
+     * 
+     * @param configValue the config value to update
+     */
+    public void updateConfigValue( UnitSelectionConfigValue configValue )
+    {
+        for ( int i = 0; i < this._listConfigValues.size( ); i++ ) 
+        {
+            if ( this._listConfigValues.get( i ).getOrder( ) == configValue.getOrder( ) ) 
+			{
+			    this._listConfigValues.set( i, configValue );
+			    break;
+            }
+        }
+    }
 }

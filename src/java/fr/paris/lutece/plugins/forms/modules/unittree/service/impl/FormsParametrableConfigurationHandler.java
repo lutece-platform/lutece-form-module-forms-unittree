@@ -52,6 +52,7 @@ import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfig;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValue;
+import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValueHome;
 import fr.paris.lutece.plugins.forms.modules.unittree.service.FormsParametrableUnitSelection;
 import fr.paris.lutece.plugins.forms.modules.unittree.service.IUnitSelectionConfigService;
 import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeCheckBox;
@@ -85,11 +86,13 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String MARK_RESPONSE_VALUE = "response_value";
     private static final String MARK_UNIT_LIST = "unit_list";
     private static final String MARK_CODE = "code";
+    private static final String MARK_ID_UNIT = "id_unit";
 
     private static final String MARK_MAPPING_LIST = "mapping_list";
     private static final String MARK_ORDER_LIST = "order_list";
     private static final String MARK_MULTIFORM = "multiform";
     private static final String MARK_CODE_LIST = "code_list";
+    private static final String MARK_HTML_EDIT_SETTING = "html_edit_setting";
 
     private static final String PARAMETER_ACTION = "apply";
     private static final String PARAMETER_FORM = "form_select";
@@ -101,6 +104,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String PARAMETER_MAPPING_ORDER = "mapping_order_";
     private static final String PARAMETER_MULTIFORM = "multiform";
     private static final String PARAMETER_CODE = "code_select";
+    private static final String PARAMETER_EDIT = "edit_setting";
     
     private static final String ACTION_SELECT_FORM = "select_form_config";
     private static final String ACTION_SELECT_STEP = "select_step_config";
@@ -111,14 +115,19 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String ACTION_CHANGE_ORDER = "change_order";
     private static final String ACTION_SELECT_MULTIFORM = "select_multiform";
     private static final String ACTION_SELECT_CODE = "select_code";
+    private static final String ACTION_COPY_SETTING = "copy_setting";
+    private static final String ACTION_EDIT_SETTING = "edit_setting";
+    private static final String ACTION_UPDATE_SETTING = "update_setting";
 
     private static final String TEMPLATE_CONFIGURATION = "admin/plugins/forms/modules/unittree/unitselection/config/forms_unit_selection_parametrable_configuration.html";
+    private static final String TEMPLATE_EDIT_SETTING = "admin/plugins/forms/modules/unittree/unitselection/config/forms_unit_selection_parametrable_edit_setting.html";
 
     @Inject
     private IUnitSelectionConfigService _unitSelectionConfigService;
 
     private UnitSelectionConfigValue _unitSelectionConfigValue;
     private UnitSelectionConfig _config;
+    private boolean _bIsEditSetting;
 
     @Override
     public String getCustomConfigForm( Locale locale, ITask task )
@@ -167,6 +176,16 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         model.put( MARK_UNIT_LIST, getUnitReferenceList( ) );
         model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
         model.put( MARK_ORDER_LIST, getOrderReferenceList( ) );
+        
+        if ( _bIsEditSetting )
+        {
+        	if ( _unitSelectionConfigValue.getUnit() != null )
+        	{
+        		model.put( MARK_ID_UNIT, _unitSelectionConfigValue.getUnit().getIdUnit( ) );
+        	}
+        	model.put( MARK_HTML_EDIT_SETTING, AppTemplateService.getTemplate( TEMPLATE_EDIT_SETTING, locale, model ).getHtml() );
+        	_bIsEditSetting = false;
+        }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CONFIGURATION, locale, model );
         return template.getHtml( );
@@ -284,6 +303,8 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
 
     private void doProcessAction( String action, HttpServletRequest request )
     {
+    	_bIsEditSetting = request.getParameter( PARAMETER_EDIT ) != null;
+    	
         switch( action )
         {
             case ACTION_SELECT_MULTIFORM:
@@ -336,6 +357,30 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
                 int idToMove = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
                 int newOrder = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ORDER + idToMove ) );
                 doChangeOrder( idToMove, newOrder );
+                break;
+            case ACTION_COPY_SETTING:
+            	int idToCopy = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
+            	UnitSelectionConfigValue configValueToCopy = _config.getListConfigValues( ).stream( ).filter ( c -> c.getIdConfigValue( ) == idToCopy ).findFirst( ).orElse( null );
+            	if ( configValueToCopy != null )
+            	{
+            		UnitSelectionConfigValue configValueCopy = copyUnitSelectionConfigValue( configValueToCopy );
+            	    _config.addConfigValue( configValueCopy );
+            	}
+                break;
+            case ACTION_EDIT_SETTING:
+            	int idMapping = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
+            	UnitSelectionConfigValue unitConfigValue = UnitSelectionConfigValueHome.findById( idMapping );
+            	if ( unitConfigValue != null )
+            	{
+                	_unitSelectionConfigValue = unitConfigValue;
+                	_bIsEditSetting = true;
+            	}
+            	break;
+            case ACTION_UPDATE_SETTING:
+            	_unitSelectionConfigValue.setUnit( UnitHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_UNIT ) ) ) );
+                _config.updateConfigValue( _unitSelectionConfigValue );
+                _unitSelectionConfigValue = new UnitSelectionConfigValue( );
+                _bIsEditSetting = false;
                 break;
             default:
                 break;
@@ -400,5 +445,29 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     public String getTitle( Locale locale )
     {
         return I18nService.getLocalizedString( "module.forms.unittree." + BEAN_NAME, locale );
+    }
+    
+    /**
+     * create a copy of a UnitSelectionConfigValue object
+     * 
+     * @param configValue the UnitSelectionConfigValue to copy
+     * @return the copy
+     */
+    private UnitSelectionConfigValue copyUnitSelectionConfigValue( UnitSelectionConfigValue configValue )
+    {
+    	UnitSelectionConfigValue configValueCopy = new UnitSelectionConfigValue( );
+
+    	if ( configValue != null )
+    	{
+    		configValueCopy.setIdConfig( configValue.getIdConfig( ) );
+        	configValueCopy.setStep( configValue.getStep( ) );
+        	configValueCopy.setQuestion( configValue.getQuestion( ) );
+        	configValueCopy.setValue( configValue.getValue( ) );
+        	configValueCopy.setUnit( configValue.getUnit( ) );
+        	configValueCopy.setCode( configValue.getCode( ) );
+        	configValueCopy.setOrder( configValue.getOrder( ) );	
+    	}
+
+    	return configValueCopy;
     }
 }
