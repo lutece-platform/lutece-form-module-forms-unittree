@@ -8,11 +8,13 @@
 </@formGroup>
 <@input type='hidden' id='mapping_id' name='mapping_id' />
 
+${html_edit_setting!}
+
 <#if multiform>
 	<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
 		<@inputGroup>
 			<@select name='code_select' items=code_list />
-			<@inputGroupItem>
+			<@inputGroupItem type='btn'>
 				<@button type='submit' buttonIcon='check' name='apply' value='select_code' />
 			</@inputGroupItem>
 		</@inputGroup>
@@ -24,26 +26,38 @@
 		<@formGroup labelFor='unit_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelUnit}'>
 			<@inputGroup params='style="margin-top:1rem;"'>
 				<@select name='unit_select' items=unit_list default_value='' />
-				<@inputGroupItem>
+				<@inputGroupItem type='btn'>
 					<@button type='submit' buttonIcon='check' name='apply' value='select_unit_config' />
 				</@inputGroupItem>
 			</@inputGroup>
 		</@formGroup>
 	</#if>
 	
-	<#list mapping_list as mapping>
+	<#if mapping_list?? && mapping_list?has_content>
 		<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
-			<@staticText>
-				${mapping.code}/${mapping.value} => ${mapping.unit.label}
-				<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' />
-			</@staticText>
+		<@table striped=true condensed=true responsive=false hover=false>
+			<@tr>
+				<@th>#i18n{module.forms.unittree.selection.parametrable.config.columnCode}</@th>
+				<@th>#i18n{module.forms.unittree.selection.parametrable.config.columnResponse}</@th>
+				<@th>#i18n{module.forms.unittree.selection.parametrable.config.columnUnit}</@th>
+				<@th></@th>
+			</@tr>
+			<#list mapping_list as mapping>
+				<@tr>
+					<@td>${mapping.code}</@td>
+					<@td>${mapping.value}</@td>
+					<@td><#if mapping.unit??>${mapping.unit.label}</#if></@td>
+					<@td><@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' /></@td>
+				</@tr>
+			</#list>
+		</@table>
 		</@formGroup>
-	</#list>
+	</#if>
 <#else>	
 	<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelForm}'>
 		<@inputGroup>
 			<@select name='form_select' items=form_list default_value='${id_form!}' />
-			<@inputGroupItem>
+			<@inputGroupItem type='btn'>
 				<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
 			</@inputGroupItem>
 		</@inputGroup>
@@ -52,7 +66,7 @@
 			<@formGroup labelFor='step_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelStep}'>
 				<@inputGroup params='style="margin-top:1rem;"'>
 					<@select name='step_select' items=step_list default_value='${id_step!}' />
-					<@inputGroupItem>
+					<@inputGroupItem type='btn'>
 						<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
 					</@inputGroupItem>
 				</@inputGroup>
@@ -62,7 +76,7 @@
 			<@formGroup labelFor='question_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelQuestion}'>
 				<@inputGroup params='style="margin-top:1rem;"'>
 					<@select name='question_select' items=question_list default_value='${id_question!}' />
-					<@inputGroupItem>
+					<@inputGroupItem type='btn'>
 						<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
 					</@inputGroupItem>
 				</@inputGroup>
@@ -72,7 +86,7 @@
 			<@formGroup labelFor='response_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelResponse}'>
 				<@inputGroup params='style="margin-top:1rem;"'>
 					<@select name='response_select' items=response_list default_value='${response_value!}' />
-					<@inputGroupItem>
+					<@inputGroupItem type='btn'>
 						<@button type='submit' buttonIcon='check' name='apply' value='select_response_config' />
 					</@inputGroupItem>
 				</@inputGroup>
@@ -82,26 +96,64 @@
 			<@formGroup labelFor='unit_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.labelUnit}'>
 				<@inputGroup params='style="margin-top:1rem;"'>
 					<@select name='unit_select' items=unit_list default_value='' />
-					<@inputGroupItem>
+					<@inputGroupItem type='btn'>
 						<@button type='submit' buttonIcon='check' name='apply' value='select_unit_config' />
 					</@inputGroupItem>
 				</@inputGroup>
 			</@formGroup>
 		</#if>
-	
-	
-	<#list mapping_list as mapping>
-		<@formGroup labelFor='form_select' labelKey='#i18n{module.forms.unittree.selection.parametrable.config.existing}'>
-			<@staticText>
-				${mapping.step.title}/${mapping.question.title}/${mapping.value} => ${mapping.unit.label}
-			</@staticText>
-			<@inputGroup>
-				<@select name='mapping_order_${mapping.idConfigValue}' items=order_list default_value='${mapping.order!}' />
-				<@inputGroupItem>
-					<@button type='submit' buttonIcon='check' name='apply' value='change_order' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
-					<@button type='submit' color='danger' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
-				</@inputGroupItem>
-			</@inputGroup>
-		</@formGroup>
-	</#list>
+
+	<#if mapping_list?? && mapping_list?has_content>
+		<@table striped=true condensed=true responsive=false hover=false>
+			<@tr>
+				<@th sm=1>#i18n{module.forms.unittree.selection.parametrable.config.columnOrder}</@th>
+				<@th colspan=4>#i18n{module.forms.unittree.selection.parametrable.config.columnConfig}</@th>
+				<@th>#i18n{module.forms.unittree.selection.parametrable.config.columnActions}</@th>
+			</@tr>
+			<@tr>
+				<@td></@td>
+				<@td params='style="font-size: 1.2em"'>#i18n{module.forms.unittree.selection.parametrable.config.columnStep}</@td>
+				<@td params='style="font-size: 1.2em"'>#i18n{module.forms.unittree.selection.parametrable.config.columnQuestion}</@td>
+				<@td params='style="font-size: 1.2em"'>#i18n{module.forms.unittree.selection.parametrable.config.columnResponse}</@td>
+				<@td params='style="font-size: 1.2em"'>#i18n{module.forms.unittree.selection.parametrable.config.columnUnit}</@td>
+				<@td></@td>
+			</@tr>
+			<#list mapping_list as mapping>
+				<@tr>
+					<@td>
+						<@inputGroup>
+							<@select name='mapping_order_${mapping.idConfigValue}' items=order_list default_value='${mapping.order!}' />
+							<@inputGroupItem type='btn'>
+								<@button type='submit' buttonIcon='check' color='blue' size='sm' name='apply' value='change_order' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+							</@inputGroupItem>
+						</@inputGroup>
+					</@td>
+					<@td>${mapping.step.title}</@td>
+					<@td>${mapping.question.title}</@td>
+					<@td>${mapping.value}</@td>
+					<@td><#if mapping.unit??>${mapping.unit.label}</#if></@td>
+					<@td>
+						<@button type='submit' buttonIcon='edit' name='apply' value='edit_setting' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' size='sm' />
+						<@button type='submit' buttonIcon='copy' name='apply' value='copy_setting' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' size='sm' />
+						<@button type='submit' buttonIcon='trash' color='danger' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' size='sm' />
+					</@td>
+				</@tr>
+			</#list>
+		</@table>
+	</#if>
+
 </#if>
+<script type="text/javascript">
+$(document).ready( function() {
+let modalElement = document.getElementById('editSettingModal');
+if ( modalElement != undefined && modalElement != null ) 
+{
+	const myModal = new bootstrap.Modal(modalElement);
+	myModal.show();
+	
+	myModal.addEventListener('hidden.bs.modal', () => {
+		modalElement.remove();
+	});
+}
+});
+</script>
