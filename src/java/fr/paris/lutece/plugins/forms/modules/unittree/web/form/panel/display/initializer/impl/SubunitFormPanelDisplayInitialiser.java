@@ -37,13 +37,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.web.form.panel.display.initializer.impl.FormPanelFormResponseIdFilterDisplayInitialiser;
-import fr.paris.lutece.plugins.unittree.business.assignment.UnitAssignment;
+import fr.paris.lutece.plugins.unittree.business.assignment.UnitAssignmentFilter;
 import fr.paris.lutece.plugins.unittree.business.assignment.UnitAssignmentHome;
 import fr.paris.lutece.plugins.unittree.business.unit.Unit;
 import fr.paris.lutece.plugins.unittree.business.unit.UnitHome;
@@ -56,7 +55,7 @@ public class SubunitFormPanelDisplayInitialiser extends FormPanelFormResponseIdF
     @Override
     protected List<Integer> getIdList( HttpServletRequest request )
     {
-        Set<Integer> formReponseIdList = new HashSet<>( );
+        List<Integer> formReponseIdList = new ArrayList<>( );
         AdminUser currentUser = AdminUserService.getAdminUser( request );
         if ( currentUser != null )
         {
@@ -67,13 +66,14 @@ public class SubunitFormPanelDisplayInitialiser extends FormPanelFormResponseIdF
                 setSubUnitId.addAll( UnitHome.getAllSubUnitsId( unit.getIdUnit( ) ) );
             }
 
-            for ( Integer id : setSubUnitId )
-            {
-                List<UnitAssignment> assignmentList = UnitAssignmentHome.findByUnit( id );
-                formReponseIdList.addAll( assignmentList.stream( ).filter( assignement -> FormResponse.RESOURCE_TYPE.equals( assignement.getResourceType( ) ) )
-                        .filter( UnitAssignment::isActive ).map( UnitAssignment::getIdResource ).distinct( ).collect( Collectors.toList( ) ) );
-            }
+            UnitAssignmentFilter filter = new UnitAssignmentFilter();
+            filter.setActive( 1 );
+            filter.setResourceType( FormResponse.RESOURCE_TYPE );
+            filter.setIdAssignedUnit( new ArrayList<>( setSubUnitId ) );
+
+            formReponseIdList = UnitAssignmentHome.findIdResourceByFilter( filter );
+
         }
-        return new ArrayList<>( formReponseIdList );
+        return formReponseIdList;
     }
 }

@@ -11,14 +11,15 @@
             </p>
             -->
             <subsection name="Introduction">
-                <p></p>
+                <p>A utiliser avec les plugins lutece-form-plugin-forms et lutece-system-plugin-unittree</p>
+                <p>Permet d’affecter à des entités les réponses à un formulaire en fonction de la valeur de la réponse à une question</p>
             </subsection>
-            <subsection name="Configuration">
-                <p></p>
-            </subsection>
-            <subsection name="Usage">
-                <p></p>
-            </subsection>
+<!--            <subsection name="Configuration">-->
+<!--                <p></p>-->
+<!--            </subsection>-->
+<!--            <subsection name="Usage">-->
+<!--                <p></p>-->
+<!--            </subsection>-->
         </section>
     </body>
 </document>
