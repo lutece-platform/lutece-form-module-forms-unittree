@@ -33,8 +33,10 @@
  */
 package fr.paris.lutece.plugins.forms.modules.unittree.service;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -50,6 +52,8 @@ import fr.paris.lutece.plugins.unittree.exception.AssignmentNotPossibleException
 import fr.paris.lutece.plugins.unittree.service.selection.IParametrableUnitSelection;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
+@ApplicationScoped
+@Named( FormsParametrableUnitSelection.BEAN_NAME )
 public class FormsParametrableUnitSelection implements IParametrableUnitSelection
 {
     public static final String BEAN_NAME = "forms-unittree.formsParametrableUnitSelection";

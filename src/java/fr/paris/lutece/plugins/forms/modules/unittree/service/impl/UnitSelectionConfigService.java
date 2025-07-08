@@ -38,7 +38,11 @@ import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSel
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValue;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValueHome;
 import fr.paris.lutece.plugins.forms.modules.unittree.service.IUnitSelectionConfigService;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
+@ApplicationScoped
+@Named( UnitSelectionConfigService.BEAN_NAME )
 public class UnitSelectionConfigService implements IUnitSelectionConfigService
 {
 

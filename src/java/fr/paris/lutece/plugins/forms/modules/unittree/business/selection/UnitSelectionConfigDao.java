@@ -37,7 +37,11 @@ import java.sql.Statement;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
+@ApplicationScoped
+@Named( UnitSelectionConfigDao.BEAN_NAME )
 public class UnitSelectionConfigDao implements IUnitSelectionConfigDao
 {
     public static final String BEAN_NAME = "forms-unittree.unitSelectionConfigDao";

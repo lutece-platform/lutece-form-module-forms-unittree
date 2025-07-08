@@ -35,6 +35,8 @@ package fr.paris.lutece.plugins.forms.modules.unittree.business.selection;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.Step;
@@ -46,6 +48,7 @@ import fr.paris.lutece.test.LuteceTestCase;
 public class UnitSelectionConfigValueBusinessTest extends LuteceTestCase
 {
 
+	@Test
     public void testCRUD( )
     {
         Unit unit = new Unit( );

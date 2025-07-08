@@ -33,11 +33,14 @@
  */
 package fr.paris.lutece.plugins.forms.modules.unittree.business.selection;
 
+import org.junit.jupiter.api.Test;
+
 import fr.paris.lutece.test.LuteceTestCase;
 
 public class UnitSelectionConfigBusinessTest extends LuteceTestCase
 {
 
+	@Test
     public void testCRUD( )
     {
         UnitSelectionConfig config = new UnitSelectionConfig( );
