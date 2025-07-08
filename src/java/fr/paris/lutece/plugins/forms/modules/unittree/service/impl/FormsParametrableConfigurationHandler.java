@@ -41,8 +41,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,7 +55,6 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfig;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValue;
 import fr.paris.lutece.plugins.forms.modules.unittree.business.selection.UnitSelectionConfigValueHome;
-import fr.paris.lutece.plugins.forms.modules.unittree.service.FormsParametrableUnitSelection;
 import fr.paris.lutece.plugins.forms.modules.unittree.service.IUnitSelectionConfigService;
 import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeCheckBox;
 import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeRadioButton;
@@ -67,11 +68,12 @@ import fr.paris.lutece.plugins.unittree.service.selection.IParametrableConfigura
 import fr.paris.lutece.plugins.unittree.service.selection.IParametrableUnitSelection;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+@ApplicationScoped
+@Named( FormsParametrableConfigurationHandler.BEAN_NAME )
 public class FormsParametrableConfigurationHandler implements IParametrableConfigurationHandler
 {
     public static final String BEAN_NAME = "forms-unittree.formsParametrableConfigurationHandler";
@@ -128,6 +130,9 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private UnitSelectionConfigValue _unitSelectionConfigValue;
     private UnitSelectionConfig _config;
     private boolean _bIsEditSetting;
+    
+    @Inject
+    private IParametrableUnitSelection _parametrableUnitSelection;
 
     @Override
     public String getCustomConfigForm( Locale locale, ITask task )
@@ -432,7 +437,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     @Override
     public IParametrableUnitSelection getParametrableUnitSelection( )
     {
-        return SpringContextService.getBean( FormsParametrableUnitSelection.BEAN_NAME );
+        return _parametrableUnitSelection;
     }
 
     @Override

@@ -42,10 +42,14 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.unittree.business.unit.UnitHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 /**
  * Implements {@link IUnitSelectionConfigValueDao}
  */
+@ApplicationScoped
+@Named( UnitSelectionConfigValueDao.BEAN_NAME )
 public class UnitSelectionConfigValueDao implements IUnitSelectionConfigValueDao
 {
     public static final String BEAN_NAME = "forms-unittree.unitSelectionConfigValueDao";

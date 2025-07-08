@@ -35,11 +35,11 @@ package fr.paris.lutece.plugins.forms.modules.unittree.business.selection;
 
 import fr.paris.lutece.plugins.forms.modules.unittree.util.FormsUnittreePlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 public class UnitSelectionConfigHome
 {
-    private static IUnitSelectionConfigDao _dao = SpringContextService.getBean( UnitSelectionConfigDao.BEAN_NAME );
+    private static IUnitSelectionConfigDao _dao = CDI.current( ).select( IUnitSelectionConfigDao.class ).get( );
     private static Plugin _plugin = FormsUnittreePlugin.getPlugin( );
 
     /**

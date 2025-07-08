@@ -3,14 +3,14 @@
     <parent>
         <artifactId>lutece-global-pom</artifactId>
         <groupId>fr.paris.lutece.tools</groupId>
-        <version>7.0.1</version>
+        <version>8.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-forms-unittree</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <name>Lutece Forms Unittree module</name>
 
     <repositories>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>fr.paris.lutece</groupId>
             <artifactId>lutece-core</artifactId>
-            <version>[7.0.0-RC-01,)</version>
+            <version>[8.0.0-SNAPSHOT,)</version>
             <type>lutece-core</type>
         </dependency>
         <dependency>
@@ -37,16 +37,22 @@
         </dependency>
         <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
-            <artifactId>plugin-regularexpression</artifactId>
-            <version>[4.0.0,)</version>
-            <type>lutece-plugin</type>
-        </dependency>
-        <dependency>
-            <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>plugin-forms</artifactId>
             <version>[2.1.0,)</version>
             <type>lutece-plugin</type>
         </dependency>
+        <!-- JUnit -->
+        <dependency>
+            <groupId>fr.paris.lutece.plugins</groupId>
+            <artifactId>library-lutece-unit-testing</artifactId>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+	        <artifactId>jaxb-runtime</artifactId>
+	        <scope>test</scope>  
+		</dependency>
     </dependencies>
 
     <properties>
