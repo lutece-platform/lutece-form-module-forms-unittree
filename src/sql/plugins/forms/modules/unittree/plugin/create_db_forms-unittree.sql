@@ -1,6 +1,6 @@
---liquibase formatted sql
---changeset forms-unittree:create_db_forms-unittree.sql
---preconditions onFail:MARK_RAN onError:WARN
+-- liquibase formatted sql
+-- changeset forms-unittree:create_db_forms-unittree.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 DROP TABLE IF EXISTS forms_unittree_unit_selection_config;
 CREATE TABLE forms_unittree_unit_selection_config
 (
