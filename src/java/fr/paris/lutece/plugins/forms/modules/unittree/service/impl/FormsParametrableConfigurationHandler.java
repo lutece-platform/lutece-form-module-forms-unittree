@@ -89,7 +89,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String MARK_RESPONSE_LIST = "response_list";
     private static final String MARK_RESPONSE_VALUE = "response_value";
     private static final String MARK_UNIT_LIST = "unit_list";
-    private static final String MARK_CODE = "code";
+    private static final String MARK_CODE = "selection_code";
     private static final String MARK_ID_UNIT = "id_unit";
 
     private static final String MARK_MAPPING_LIST = "mapping_list";
