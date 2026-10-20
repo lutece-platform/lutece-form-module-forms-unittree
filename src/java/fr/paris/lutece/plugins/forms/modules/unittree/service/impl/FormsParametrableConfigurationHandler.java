@@ -71,6 +71,7 @@ import fr.paris.lutece.plugins.unittree.service.selection.IParametrableUnitSelec
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -254,7 +255,8 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         	{
         		model.put( MARK_ID_UNIT, unitSelectionConfigValue.getUnit().getIdUnit( ) );
         	}
-        	model.put( MARK_HTML_EDIT_SETTING, AppTemplateService.getTemplate( TEMPLATE_EDIT_SETTING, locale, model ).getHtml() );
+        	// the edit setting modal is HTML rendered by the module's template (its data escaped there): written as is
+        	model.put( MARK_HTML_EDIT_SETTING, HtmlMarkup.of( AppTemplateService.getTemplate( TEMPLATE_EDIT_SETTING, locale, model ).getHtml( ) ) );
         	state._bIsEditSetting = false;
         	saveEditingState( _request, task.getId( ), state );
         }
