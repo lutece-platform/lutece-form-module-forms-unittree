@@ -75,10 +75,14 @@ public class FormsParametrableConfigurationRenderTest
 
     /**
      * Stand-ins of the core macros the templates call: they write their arguments (escaped) and their nested content. The
-     * button writes its params, which must be a map.
+     * button writes its params, which must be a map. The i18n function of the core (a message with arguments) returns the
+     * key.
      */
     private static final String MACROS = "macros.ftl";
-    private static final String MACROS_SOURCE = "<#macro formGroup rest...><div class=\"form-group\"><#nested></div></#macro>"
+    private static final String MACROS_SOURCE = "<#function i18n key args...><#return key></#function>"
+            + "<#macro modal id rest...><div class=\"modal\" id=\"${id}\"><#nested></div></#macro>"
+            + "<#macro modalHeader rest...></#macro>" + "<#macro modalBody rest...><#nested></#macro>"
+            + "<#macro formGroup rest...><div class=\"form-group\"><#nested></div></#macro>"
             + "<#macro inputGroup rest...><#nested></#macro>" + "<#macro inputGroupItem rest...><#nested></#macro>"
             + "<#macro checkBox rest...><input type=\"checkbox\"></#macro>"
             + "<#macro input name='' value='' rest...><input name=\"${name}\" value=\"${value}\"></#macro>"
