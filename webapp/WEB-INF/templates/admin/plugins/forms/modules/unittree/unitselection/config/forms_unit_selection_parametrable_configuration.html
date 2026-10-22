@@ -47,7 +47,7 @@ ${html_edit_setting!}
 					<@td>${mapping.code}</@td>
 					<@td>${mapping.value}</@td>
 					<@td><#if mapping.unit??>${mapping.unit.label}</#if></@td>
-					<@td><@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' /></@td>
+					<@td><@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='data-mapping-id="${mapping.idConfigValue}"' color='danger' size='sm' /></@td>
 				</@tr>
 			</#list>
 		</@table>
@@ -124,7 +124,7 @@ ${html_edit_setting!}
 						<@inputGroup>
 							<@select name='mapping_order_${mapping.idConfigValue}' items=order_list default_value='${mapping.order!}' />
 							<@inputGroupItem type='btn'>
-								<@button type='submit' buttonIcon='check' color='blue' size='sm' name='apply' value='change_order' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+								<@button type='submit' buttonIcon='check' color='blue' size='sm' name='apply' value='change_order' params='data-mapping-id="${mapping.idConfigValue}"' />
 							</@inputGroupItem>
 						</@inputGroup>
 					</@td>
@@ -133,9 +133,9 @@ ${html_edit_setting!}
 					<@td>${mapping.value}</@td>
 					<@td><#if mapping.unit??>${mapping.unit.label}</#if></@td>
 					<@td>
-						<@button type='submit' buttonIcon='edit' name='apply' value='edit_setting' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' size='sm' />
-						<@button type='submit' buttonIcon='copy' name='apply' value='copy_setting' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' size='sm' />
-						<@button type='submit' buttonIcon='trash' color='danger' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' size='sm' />
+						<@button type='submit' buttonIcon='edit' name='apply' value='edit_setting' params='data-mapping-id="${mapping.idConfigValue}"' size='sm' />
+						<@button type='submit' buttonIcon='copy' name='apply' value='copy_setting' params='data-mapping-id="${mapping.idConfigValue}"' size='sm' />
+						<@button type='submit' buttonIcon='trash' color='danger' name='apply' value='delete_mapping' params='data-mapping-id="${mapping.idConfigValue}"' size='sm' />
 					</@td>
 				</@tr>
 			</#list>
@@ -143,17 +143,24 @@ ${html_edit_setting!}
 	</#if>
 
 </#if>
-<script type="text/javascript">
-$(document).ready( function() {
-let modalElement = document.getElementById('editSettingModal');
-if ( modalElement != undefined && modalElement != null ) 
-{
-	const myModal = new bootstrap.Modal(modalElement);
-	myModal.show();
-	
-	myModal.addEventListener('hidden.bs.modal', () => {
-		modalElement.remove();
-	});
+<script>
+document.querySelectorAll( '[data-mapping-id]' ).forEach( function( button ) {
+	button.addEventListener( 'click', function( ) {
+		document.getElementById( 'mapping_id' ).value = button.dataset.mappingId;
+	} );
+} );
+function showEditSettingModal( ) {
+	const modalElement = document.getElementById( 'editSettingModal' );
+	if ( modalElement ) {
+		modalElement.addEventListener( 'hidden.bs.modal', function( ) {
+			modalElement.remove( );
+		} );
+		new bootstrap.Modal( modalElement ).show( );
+	}
 }
-});
+if ( document.readyState === 'loading' ) {
+	document.addEventListener( 'DOMContentLoaded', showEditSettingModal );
+} else {
+	showEditSettingModal( );
+}
 </script>
