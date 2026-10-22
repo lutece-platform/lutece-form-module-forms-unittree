@@ -33,12 +33,16 @@
  */
 package fr.paris.lutece.plugins.forms.modules.unittree.business.selection;
 
+import java.io.Serializable;
+
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.unittree.business.unit.Unit;
 
-public class UnitSelectionConfigValue
+public class UnitSelectionConfigValue implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private int _nIdConfigValue;
     private int _nIdConfig;
     private Step _step;

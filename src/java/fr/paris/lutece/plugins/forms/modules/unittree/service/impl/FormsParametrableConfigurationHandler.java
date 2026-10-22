@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.forms.modules.unittree.service.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -124,72 +126,137 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     private static final String TEMPLATE_CONFIGURATION = "admin/plugins/forms/modules/unittree/unitselection/config/forms_unit_selection_parametrable_configuration.html";
     private static final String TEMPLATE_EDIT_SETTING = "admin/plugins/forms/modules/unittree/unitselection/config/forms_unit_selection_parametrable_edit_setting.html";
 
+    private static final String ATTRIBUTE_EDITING_STATE = FormsParametrableConfigurationHandler.class.getName( ) + ".editingState.";
+
     @Inject
     private IUnitSelectionConfigService _unitSelectionConfigService;
 
-    private UnitSelectionConfigValue _unitSelectionConfigValue;
-    private UnitSelectionConfig _config;
-    private boolean _bIsEditSetting;
-    
     @Inject
     private IParametrableUnitSelection _parametrableUnitSelection;
+
+    @Inject
+    private HttpServletRequest _request;
+
+    /**
+     * Mapping being entered by a user on the configuration of a task: kept in the session of the user, for the task, so that two users or two tasks
+     * never share it
+     */
+    static final class EditingState implements Serializable
+    {
+        private static final long serialVersionUID = 1L;
+
+        private UnitSelectionConfigValue _unitSelectionConfigValue = new UnitSelectionConfigValue( );
+        private boolean _bIsEditSetting;
+
+        /**
+         * Gets the mapping being entered
+         *
+         * @return the mapping being entered
+         */
+        UnitSelectionConfigValue getUnitSelectionConfigValue( )
+        {
+            return _unitSelectionConfigValue;
+        }
+    }
+
+    /**
+     * Gets the mapping being entered by the user of the request on the configuration of the task, created if needed
+     *
+     * @param request
+     *            the request
+     * @param nIdTask
+     *            the task id
+     * @return the editing state
+     */
+    static EditingState getEditingState( HttpServletRequest request, int nIdTask )
+    {
+        HttpSession session = request.getSession( true );
+        String strAttribute = ATTRIBUTE_EDITING_STATE + nIdTask;
+        EditingState state = (EditingState) session.getAttribute( strAttribute );
+        if ( state == null )
+        {
+            state = new EditingState( );
+            session.setAttribute( strAttribute, state );
+        }
+        return state;
+    }
+
+    /**
+     * Saves the editing state in the session, so that its changes are kept by a distributed session
+     *
+     * @param request
+     *            the request
+     * @param nIdTask
+     *            the task id
+     * @param state
+     *            the editing state
+     */
+    private static void saveEditingState( HttpServletRequest request, int nIdTask, EditingState state )
+    {
+        request.getSession( true ).setAttribute( ATTRIBUTE_EDITING_STATE + nIdTask, state );
+    }
 
     @Override
     public String getCustomConfigForm( Locale locale, ITask task )
     {
-        _config = _unitSelectionConfigService.loadConfigByTask( task.getId( ) );
-        if ( _unitSelectionConfigValue == null )
+        UnitSelectionConfig config = _unitSelectionConfigService.loadConfigByTask( task.getId( ) );
+        if ( config == null )
         {
-            _unitSelectionConfigValue = new UnitSelectionConfigValue( );
+            config = new UnitSelectionConfig( );
         }
-        if ( _config == null )
+        EditingState state = getEditingState( _request, task.getId( ) );
+        UnitSelectionConfigValue unitSelectionConfigValue = state._unitSelectionConfigValue;
+        if ( unitSelectionConfigValue.getQuestion( ) != null && QuestionHome.findByPrimaryKey( unitSelectionConfigValue.getQuestion( ).getId( ) ) == null )
         {
-            _config = new UnitSelectionConfig( );
+            unitSelectionConfigValue.setQuestion( null );
+            unitSelectionConfigValue.setValue( null );
+            saveEditingState( _request, task.getId( ), state );
         }
 
         Map<String, Object> model = new HashMap<>( );
-        model.put( MARK_MULTIFORM, _config.isMultiform( ) ); 
-        if ( _config.isMultiform( ) )
+        model.put( MARK_MULTIFORM, config.isMultiform( ) ); 
+        if ( config.isMultiform( ) )
         {
             model.put( MARK_CODE_LIST, getCodeList( ) );
         }
 
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
-        if ( _config.getIdForm( ) != -1 )
+        if ( config.getIdForm( ) != -1 )
         {
-            model.put( MARK_ID_FORM, _config.getIdForm( ) );
-            model.put( MARK_STEP_LIST, StepHome.getStepReferenceListByForm( _config.getIdForm( ) ) );
+            model.put( MARK_ID_FORM, config.getIdForm( ) );
+            model.put( MARK_STEP_LIST, StepHome.getStepReferenceListByForm( config.getIdForm( ) ) );
         }
-        if ( _unitSelectionConfigValue.getStep( ) != null )
+        if ( unitSelectionConfigValue.getStep( ) != null )
         {
-            model.put( MARK_ID_STEP, _unitSelectionConfigValue.getStep( ).getId( ) );
-            model.put( MARK_QUESTION_LIST, getQuestionReferenceList( _unitSelectionConfigValue.getStep( ).getId( ) ) );
+            model.put( MARK_ID_STEP, unitSelectionConfigValue.getStep( ).getId( ) );
+            model.put( MARK_QUESTION_LIST, getQuestionReferenceList( unitSelectionConfigValue.getStep( ).getId( ) ) );
         }
-        if ( _unitSelectionConfigValue.getQuestion( ) != null )
+        if ( unitSelectionConfigValue.getQuestion( ) != null )
         {
-            model.put( MARK_ID_QUESTION, _unitSelectionConfigValue.getQuestion( ).getId( ) );
-            model.put( MARK_RESPONSE_LIST, getResponseReferenceList( _unitSelectionConfigValue.getQuestion( ).getId( ) ) );
+            model.put( MARK_ID_QUESTION, unitSelectionConfigValue.getQuestion( ).getId( ) );
+            model.put( MARK_RESPONSE_LIST, getResponseReferenceList( unitSelectionConfigValue.getQuestion( ).getId( ) ) );
         }
-        if ( StringUtils.isNotEmpty( _unitSelectionConfigValue.getValue( ) ) )
+        if ( StringUtils.isNotEmpty( unitSelectionConfigValue.getValue( ) ) )
         {
-            model.put( MARK_RESPONSE_VALUE, _unitSelectionConfigValue.getValue( ) );
+            model.put( MARK_RESPONSE_VALUE, unitSelectionConfigValue.getValue( ) );
         }
-        if ( StringUtils.isNotEmpty( _unitSelectionConfigValue.getCode( ) ) )
+        if ( StringUtils.isNotEmpty( unitSelectionConfigValue.getCode( ) ) )
         {
-            model.put( MARK_CODE, _unitSelectionConfigValue.getCode( ) );
+            model.put( MARK_CODE, unitSelectionConfigValue.getCode( ) );
         }
         model.put( MARK_UNIT_LIST, getUnitReferenceList( ) );
-        model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
-        model.put( MARK_ORDER_LIST, getOrderReferenceList( ) );
+        model.put( MARK_MAPPING_LIST, config.getListConfigValues( ) );
+        model.put( MARK_ORDER_LIST, getOrderReferenceList( config ) );
         
-        if ( _bIsEditSetting )
+        if ( state._bIsEditSetting )
         {
-        	if ( _unitSelectionConfigValue.getUnit() != null )
+        	if ( unitSelectionConfigValue.getUnit() != null )
         	{
-        		model.put( MARK_ID_UNIT, _unitSelectionConfigValue.getUnit().getIdUnit( ) );
+        		model.put( MARK_ID_UNIT, unitSelectionConfigValue.getUnit().getIdUnit( ) );
         	}
         	model.put( MARK_HTML_EDIT_SETTING, AppTemplateService.getTemplate( TEMPLATE_EDIT_SETTING, locale, model ).getHtml() );
-        	_bIsEditSetting = false;
+        	state._bIsEditSetting = false;
+        	saveEditingState( _request, task.getId( ), state );
         }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CONFIGURATION, locale, model );
@@ -209,10 +276,17 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         return refList;
     }
     
-    private ReferenceList getOrderReferenceList( )
+    /**
+     * Builds the list of the orders of the mappings of a configuration
+     *
+     * @param config
+     *            the configuration of the task
+     * @return the orders
+     */
+    private ReferenceList getOrderReferenceList( UnitSelectionConfig config )
     {
         ReferenceList refList = new ReferenceList( );
-        for ( int i = 0; i < _config.getListConfigValues( ).size( ); i++ )
+        for ( int i = 0; i < config.getListConfigValues( ).size( ); i++ )
         {
             int order = i + 1;
             refList.addItem( order, String.valueOf( order ) );
@@ -239,13 +313,20 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
         return refList;
     }
 
-    private ReferenceList getResponseReferenceList( int idQuestion )
+    /**
+     * Builds the list of the answer choices of a question; empty when the question no longer exists
+     *
+     * @param idQuestion
+     *            the question id
+     * @return the answer choices
+     */
+    static ReferenceList getResponseReferenceList( int idQuestion )
     {
         ReferenceList refList = new ReferenceList( );
         refList.addItem( "", "" );
-        if ( idQuestion != -1 )
+        Question question = ( idQuestion != -1 ) ? QuestionHome.findByPrimaryKey( idQuestion ) : null;
+        if ( question != null && question.getEntry( ) != null && question.getEntry( ).getFields( ) != null )
         {
-            Question question = QuestionHome.findByPrimaryKey( idQuestion );
             for ( Field field : question.getEntry( ).getFields( ) )
             {
                 if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) )
@@ -281,95 +362,109 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
     @Override
     public String saveConfiguration( HttpServletRequest request, ITask task )
     {
-        _config = _unitSelectionConfigService.loadConfigByTask( task.getId( ) );
-        boolean create = _config == null;
+        UnitSelectionConfig config = _unitSelectionConfigService.loadConfigByTask( task.getId( ) );
+        boolean create = config == null;
         if ( create )
         {
-            _config = new UnitSelectionConfig( );
-            _config.setIdTask( task.getId( ) );
+            config = new UnitSelectionConfig( );
+            config.setIdTask( task.getId( ) );
         }
 
         String action = request.getParameter( PARAMETER_ACTION );
         if ( action != null )
         {
-            doProcessAction( action, request );
+            EditingState state = getEditingState( request, task.getId( ) );
+            doProcessAction( action, request, config, state );
+            saveEditingState( request, task.getId( ), state );
         }
 
         if ( create )
         {
-            _unitSelectionConfigService.createConfig( _config );
+            _unitSelectionConfigService.createConfig( config );
         }
         else
         {
-            _unitSelectionConfigService.updateConfig( _config );
+            _unitSelectionConfigService.updateConfig( config );
         }
         return null;
     }
 
-    private void doProcessAction( String action, HttpServletRequest request )
+    /**
+     * Applies an action of the configuration form to the configuration of the task and to the mapping being entered
+     *
+     * @param action
+     *            the action
+     * @param request
+     *            the request
+     * @param config
+     *            the configuration of the task
+     * @param state
+     *            the mapping being entered by the user
+     */
+    private void doProcessAction( String action, HttpServletRequest request, UnitSelectionConfig config, EditingState state )
     {
-    	_bIsEditSetting = request.getParameter( PARAMETER_EDIT ) != null;
+    	state._bIsEditSetting = request.getParameter( PARAMETER_EDIT ) != null;
     	
         switch( action )
         {
             case ACTION_SELECT_MULTIFORM:
-                _config.setMultiform( request.getParameter( PARAMETER_MULTIFORM ) != null );
-                _config.setIdForm( 0 );
-                _unitSelectionConfigValue.setCode( null );
-                _unitSelectionConfigValue.setQuestion( null );
-                _unitSelectionConfigValue.setValue( null );
-                _unitSelectionConfigValue.setUnit( null );
-                _unitSelectionConfigValue = new UnitSelectionConfigValue( );
-                _config.setListConfigValues( new ArrayList<>( ) );
+                config.setMultiform( request.getParameter( PARAMETER_MULTIFORM ) != null );
+                config.setIdForm( 0 );
+                state._unitSelectionConfigValue.setCode( null );
+                state._unitSelectionConfigValue.setQuestion( null );
+                state._unitSelectionConfigValue.setValue( null );
+                state._unitSelectionConfigValue.setUnit( null );
+                state._unitSelectionConfigValue = new UnitSelectionConfigValue( );
+                config.setListConfigValues( new ArrayList<>( ) );
                 break;
             case ACTION_SELECT_CODE:
-                _unitSelectionConfigValue.setCode( request.getParameter( PARAMETER_CODE ) );
+                state._unitSelectionConfigValue.setCode( request.getParameter( PARAMETER_CODE ) );
                 break;
             case ACTION_SELECT_FORM:
-                _config.setIdForm( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) );
+                config.setIdForm( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) );
                 break;
             case ACTION_SELECT_STEP:
-                _unitSelectionConfigValue.setStep( StepHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_STEP ) ) ) );
-                _unitSelectionConfigValue.setQuestion( null );
-                _unitSelectionConfigValue.setValue( null );
-                _unitSelectionConfigValue.setUnit( null );
+                state._unitSelectionConfigValue.setStep( StepHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_STEP ) ) ) );
+                state._unitSelectionConfigValue.setQuestion( null );
+                state._unitSelectionConfigValue.setValue( null );
+                state._unitSelectionConfigValue.setUnit( null );
                 break;
             case ACTION_SELECT_QUESTION:
-                _unitSelectionConfigValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
-                _unitSelectionConfigValue.setValue( null );
-                _unitSelectionConfigValue.setUnit( null );
+                state._unitSelectionConfigValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
+                state._unitSelectionConfigValue.setValue( null );
+                state._unitSelectionConfigValue.setUnit( null );
                 break;
             case ACTION_SELECT_RESPONSE:
-                _unitSelectionConfigValue.setValue( request.getParameter( PARAMETER_RESPONSE ) );
-                _unitSelectionConfigValue.setUnit( null );
+                state._unitSelectionConfigValue.setValue( request.getParameter( PARAMETER_RESPONSE ) );
+                state._unitSelectionConfigValue.setUnit( null );
                 break;
             case ACTION_SELECT_UNIT:
-                if ( _config.isMultiform( ) )
+                if ( config.isMultiform( ) )
                 {
-                    _unitSelectionConfigValue.setValue( request.getParameter( PARAMETER_RESPONSE ) );
+                    state._unitSelectionConfigValue.setValue( request.getParameter( PARAMETER_RESPONSE ) );
                 }
-                _unitSelectionConfigValue.setUnit( UnitHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_UNIT ) ) ) );
-                _config.addConfigValue( _unitSelectionConfigValue );
-                _unitSelectionConfigValue = new UnitSelectionConfigValue( );
+                state._unitSelectionConfigValue.setUnit( UnitHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_UNIT ) ) ) );
+                config.addConfigValue( state._unitSelectionConfigValue );
+                state._unitSelectionConfigValue = new UnitSelectionConfigValue( );
                 break;
             case ACTION_REMOVE_MAPPING:
                 int idToRemove = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
-                List<UnitSelectionConfigValue> newList = _config.getListConfigValues( ).stream( )
+                List<UnitSelectionConfigValue> newList = config.getListConfigValues( ).stream( )
                         .filter( configValue -> configValue.getIdConfigValue( ) != idToRemove ).collect( Collectors.toList( ) );
-                _config.setListConfigValues( newList );
+                config.setListConfigValues( newList );
                 break;
             case ACTION_CHANGE_ORDER:
                 int idToMove = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
                 int newOrder = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ORDER + idToMove ) );
-                doChangeOrder( idToMove, newOrder );
+                doChangeOrder( config, idToMove, newOrder );
                 break;
             case ACTION_COPY_SETTING:
             	int idToCopy = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
-            	UnitSelectionConfigValue configValueToCopy = _config.getListConfigValues( ).stream( ).filter ( c -> c.getIdConfigValue( ) == idToCopy ).findFirst( ).orElse( null );
+            	UnitSelectionConfigValue configValueToCopy = config.getListConfigValues( ).stream( ).filter ( c -> c.getIdConfigValue( ) == idToCopy ).findFirst( ).orElse( null );
             	if ( configValueToCopy != null )
             	{
             		UnitSelectionConfigValue configValueCopy = copyUnitSelectionConfigValue( configValueToCopy );
-            	    _config.addConfigValue( configValueCopy );
+            	    config.addConfigValue( configValueCopy );
             	}
                 break;
             case ACTION_EDIT_SETTING:
@@ -377,24 +472,34 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
             	UnitSelectionConfigValue unitConfigValue = UnitSelectionConfigValueHome.findById( idMapping );
             	if ( unitConfigValue != null )
             	{
-                	_unitSelectionConfigValue = unitConfigValue;
-                	_bIsEditSetting = true;
+                	state._unitSelectionConfigValue = unitConfigValue;
+                	state._bIsEditSetting = true;
             	}
             	break;
             case ACTION_UPDATE_SETTING:
-            	_unitSelectionConfigValue.setUnit( UnitHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_UNIT ) ) ) );
-                _config.updateConfigValue( _unitSelectionConfigValue );
-                _unitSelectionConfigValue = new UnitSelectionConfigValue( );
-                _bIsEditSetting = false;
+            	state._unitSelectionConfigValue.setUnit( UnitHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_UNIT ) ) ) );
+                config.updateConfigValue( state._unitSelectionConfigValue );
+                state._unitSelectionConfigValue = new UnitSelectionConfigValue( );
+                state._bIsEditSetting = false;
                 break;
             default:
                 break;
         }
     }
 
-    private void doChangeOrder( int idToMove, int newOrder )
+    /**
+     * Moves a mapping of a configuration to a new order, shifting the others
+     *
+     * @param config
+     *            the configuration of the task
+     * @param idToMove
+     *            the id of the mapping to move
+     * @param newOrder
+     *            the new order of the mapping
+     */
+    private void doChangeOrder( UnitSelectionConfig config, int idToMove, int newOrder )
     {
-        List<UnitSelectionConfigValue> newList = _config.getListConfigValues( );
+        List<UnitSelectionConfigValue> newList = config.getListConfigValues( );
         UnitSelectionConfigValue configToChangeOrder = newList.stream( ).filter( cv -> cv.getIdConfigValue( ) == idToMove ).findFirst( ).orElse( null );
         if ( configToChangeOrder == null )
         {
@@ -425,7 +530,7 @@ public class FormsParametrableConfigurationHandler implements IParametrableConfi
                 }
             }
         }
-        _config.setListConfigValues( newList );
+        config.setListConfigValues( newList );
     }
 
     @Override
