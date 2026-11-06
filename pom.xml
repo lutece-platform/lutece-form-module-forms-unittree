@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-forms-unittree</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>3.0.2-beta-02</version>
+    <version>3.0.2-SNAPSHOT</version>
     <name>Lutece Forms Unittree module</name>
 
     <repositories>
